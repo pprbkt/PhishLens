@@ -1,0 +1,52 @@
+{
+  "model_version": "phishlens-v1",
+  "model_type": "Logistic_Regression",
+  "created_at": "2026-09-23T22:04:08.940237+00:00",
+  "optimal_threshold": 0.42,
+  "precision_target": 0.9,
+  "metrics": {
+    "accuracy": 0.9905,
+    "scam_precision": 0.9573,
+    "scam_recall": 0.9739,
+    "scam_f1": 0.9655,
+    "roc_auc": 0.9987,
+    "pr_auc": 0.9934,
+    "operating_threshold": 0.42,
+    "confusion_matrix": {
+      "true_negative": 722,
+      "false_positive": 5,
+      "false_negative": 3,
+      "true_positive": 112
+    },
+    "test_samples_total": 842,
+    "test_scam_samples": 115,
+    "test_not_scam_samples": 727
+  },
+  "validation_comparison": {
+    "Logistic_Regression": {
+      "accuracy": 0.9881,
+      "scam_precision": 0.9565,
+      "scam_recall": 0.9565,
+      "scam_f1": 0.9565
+    },
+    "Linear_SVM": {
+      "accuracy": 0.9881,
+      "scam_precision": 0.9565,
+      "scam_recall": 0.9565,
+      "scam_f1": 0.9565
+    },
+    "Naive_Bayes": {
+      "accuracy": 0.9845,
+      "scam_precision": 0.9474,
+      "scam_recall": 0.9391,
+      "scam_f1": 0.9432
+    }
+  },
+  "dataset_info": {
+    "total_samples": 5609,
+    "train_samples": 3926,
+    "val_samples": 841,
+    "test_samples": 842,
+    "scam_ratio": 0.1367
+  }
+}

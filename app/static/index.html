@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhishLens — High-Precision Scam & Phishing Detection</title>
+  <meta name="description" content="AI & OCR-powered scam and smishing detection system with precision-tuned machine learning and explainable risk signals.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Neo-Brutalist Top Banner / Header -->
+  <header class="neo-header">
+    <div class="header-container">
+      <div class="brand-badge">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-titles">
+          <h1 class="brand-name">PHISH<span class="highlight">LENS</span></h1>
+          <span class="brand-tagline">AI PHISHING & SMISHING RADAR</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="status-chip" id="api-status-chip">
+          <span class="status-dot"></span>
+          <span id="api-status-text">CONNECTING...</span>
+        </div>
+        <a href="/docs" target="_blank" class="neo-btn neo-btn-sm neo-btn-docs">API DOCS ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-wrapper">
+    <!-- Hero / Headline Bar -->
+    <section class="hero-bar">
+      <div class="hero-content">
+        <span class="badge badge-accent">HIGH-PRECISION CLASSIFIER</span>
+        <h2 class="hero-title">Intercept Fraud Before It Strikes.</h2>
+        <p class="hero-subtitle">Detect phishing in SMS texts and screenshot images with OCR extraction, calibrated probability scoring, and explainable risk signals.</p>
+      </div>
+      <!-- Live Model Stats Strip -->
+      <div class="model-stats-card">
+        <div class="stat-box">
+          <span class="stat-label">SCAM PRECISION</span>
+          <span class="stat-val" id="metric-precision">95.7%</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">SCAM RECALL</span>
+          <span class="stat-val" id="metric-recall">97.4%</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">ACCURACY</span>
+          <span class="stat-val" id="metric-accuracy">99.1%</span>
+        </div>
+        <div class="stat-box stat-highlight">
+          <span class="stat-label">THRESHOLD</span>
+          <span class="stat-val" id="metric-threshold">0.42</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace Grid -->
+    <div class="workspace-grid">
+      <!-- Input Column -->
+      <div class="workspace-col">
+        <div class="neo-card input-card">
+          <!-- Card Tab Navigation -->
+          <div class="tab-bar">
+            <button class="tab-btn active" id="tab-text" onclick="switchTab('text')">
+              <span class="tab-icon">💬</span> SMS / TEXT MESSAGE
+            </button>
+            <button class="tab-btn" id="tab-image" onclick="switchTab('image')">
+              <span class="tab-icon">📷</span> SCREENSHOT (OCR)
+            </button>
+          </div>
+
+          <!-- Tab Content: Text Mode -->
+          <div class="tab-panel active" id="panel-text">
+            <div class="panel-header">
+              <label for="input-text" class="input-label">PASTE SUSPICIOUS MESSAGE</label>
+              <span class="char-count" id="char-count">0 / 10,000</span>
+            </div>
+            <textarea
+              id="input-text"
+              class="neo-textarea"
+              placeholder="e.g. URGENT: Your bank account has been blocked due to KYC. Click http://sbi-kyc-update.top to verify..."
+              rows="6"
+              maxlength="10000"
+            ></textarea>
+
+            <!-- Quick Presets -->
+            <div class="presets-section">
+              <span class="presets-title">QUICK TEST PRESETS:</span>
+              <div class="preset-chips">
+                <button class="chip-btn chip-scam" onclick="loadPreset('sbi_kyc')">🚨 Bank KYC Scam</button>
+                <button class="chip-btn chip-scam" onclick="loadPreset('fedex')">📦 FedEx Smishing</button>
+                <button class="chip-btn chip-scam" onclick="loadPreset('crypto')">💰 Crypto Giveaway</button>
+                <button class="chip-btn chip-safe" onclick="loadPreset('otp')">🛡️ Real Bank OTP</button>
+                <button class="chip-btn chip-safe" onclick="loadPreset('uber')">🚗 Uber Pickup</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Content: Screenshot OCR Mode -->
+          <div class="tab-panel" id="panel-image">
+            <div class="panel-header">
+              <label class="input-label">UPLOAD SCREENSHOT</label>
+              <span class="file-hint">PNG, JPG, WEBP (Max 10MB)</span>
+            </div>
+            
+            <div class="dropzone" id="dropzone" onclick="triggerFileInput()">
+              <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;" onchange="handleFileSelected(event)">
+              <div class="dropzone-empty" id="dropzone-empty">
+                <div class="upload-icon">📸</div>
+                <h3 class="dropzone-title">DRAG & DROP SCREENSHOT HERE</h3>
+                <p class="dropzone-sub">or click to browse your filesystem</p>
+                <span class="badge badge-outline">Auto OCR Processing</span>
+              </div>
+              <div class="dropzone-preview" id="dropzone-preview" style="display:none;">
+                <img id="image-preview" src="" alt="Screenshot Preview">
+                <div class="preview-overlay">
+                  <span id="preview-filename">image.png</span>
+                  <button type="button" class="btn-remove" onclick="removeFile(event)">✕ REMOVE</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls & Action Button -->
+          <div class="card-footer">
+            <div class="threshold-slider-group">
+              <div class="slider-header">
+                <span class="slider-label">DECISION THRESHOLD:</span>
+                <span class="slider-val" id="threshold-val-display">DEFAULT (0.42)</span>
+              </div>
+              <input type="range" id="threshold-slider" min="0.10" max="0.95" step="0.01" value="0.42" oninput="updateThresholdDisplay(this.value)">
+            </div>
+            <button class="neo-btn neo-btn-primary" id="btn-analyze" onclick="runAnalysis()">
+              <span class="btn-icon">⚡</span> RUN PHISHLENS ANALYSIS
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Column -->
+      <div class="workspace-col">
+        <div class="neo-card results-card" id="results-card">
+          <!-- Results Header -->
+          <div class="card-header-bar">
+            <h3 class="card-title">ANALYSIS VERDICT</h3>
+            <span class="badge badge-neutral" id="model-tag">MODEL: PHISHLENS-V1</span>
+          </div>
+
+          <!-- Empty State (Placeholder before first run) -->
+          <div class="empty-state" id="empty-state">
+            <div class="empty-illustration">🔍</div>
+            <h4>NO ANALYSIS PERFORMED YET</h4>
+            <p>Paste a message or upload an image screenshot on the left and click <strong>RUN PHISHLENS ANALYSIS</strong> to inspect.</p>
+          </div>
+
+          <!-- Loading State -->
+          <div class="loading-state" id="loading-state" style="display:none;">
+            <div class="spinner"></div>
+            <h4 id="loading-msg">PROCESSING INFERENCE PIPELINE...</h4>
+            <p class="loading-sub">Running entity normalizer, TF-IDF vectorization & risk evaluation</p>
+          </div>
+
+          <!-- Loaded Result Content -->
+          <div class="result-content" id="result-content" style="display:none;">
+            <!-- Primary Verdict Banner -->
+            <div class="verdict-banner" id="verdict-banner">
+              <div class="verdict-badge-wrap">
+                <span class="verdict-label" id="verdict-label">SCAM</span>
+              </div>
+              <div class="verdict-meta">
+                <span class="risk-badge" id="risk-badge">HIGH_RISK</span>
+                <span class="threshold-meta" id="threshold-meta">Threshold: 0.42</span>
+              </div>
+            </div>
+
+            <!-- Probability Meter -->
+            <div class="meter-section">
+              <div class="meter-labels">
+                <span class="meter-title">SCAM PROBABILITY</span>
+                <span class="meter-value" id="probability-value">97.8%</span>
+              </div>
+              <div class="meter-bar-track">
+                <div class="meter-bar-fill" id="meter-bar-fill" style="width: 97.8%;"></div>
+                <div class="threshold-marker" id="threshold-marker" style="left: 42%;" title="Decision Threshold"></div>
+              </div>
+              <div class="meter-scale">
+                <span>0% Safe</span>
+                <span id="threshold-marker-label">Th: 42%</span>
+                <span>100% Phishing</span>
+              </div>
+            </div>
+
+            <!-- OCR Text (Only visible when image mode is used) -->
+            <div class="ocr-section" id="ocr-section" style="display:none;">
+              <div class="ocr-header">
+                <span class="ocr-title">EXTRACTED OCR TEXT</span>
+                <span class="badge badge-accent" id="ocr-conf-badge">CONF: 94.2%</span>
+              </div>
+              <div class="ocr-text-box" id="ocr-text-box"></div>
+            </div>
+
+            <!-- Explainability: Risk Signals -->
+            <div class="signals-section">
+              <div class="signals-header">
+                <span class="signals-title">EXPLAINABLE RISK SIGNALS</span>
+                <span class="signals-count" id="signals-count">3 Signals Found</span>
+              </div>
+              <div class="signals-list" id="signals-list">
+                <!-- Dynamically injected -->
+              </div>
+            </div>
+
+            <!-- Raw JSON Output Collapsible -->
+            <div class="json-drawer">
+              <button class="json-toggle-btn" onclick="toggleJsonDrawer()">
+                <span>{ } RAW JSON PAYLOAD</span>
+                <span id="json-toggle-icon">▼</span>
+              </button>
+              <pre class="json-pre" id="json-pre" style="display:none;"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="neo-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <strong>PhishLens</strong> — Precision-Oriented Phishing Detection Framework
+      </div>
+      <div class="footer-right">
+        <span>⚡ Built with FastAPI, scikit-learn & RapidOCR</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

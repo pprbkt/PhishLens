@@ -1,0 +1,17 @@
+services:
+  phishlens:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: phishlens_api
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - APP_PORT=8000
+      - APP_HOST=0.0.0.0
+      - MODEL_PATH=models/classifier.joblib
+      - VECTORIZER_PATH=models/vectorizer.joblib
+      - METADATA_PATH=models/metadata.json
+      - SCAM_THRESHOLD=0.42
+    restart: unless-stopped

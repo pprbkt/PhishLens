@@ -1,0 +1,18 @@
+{
+  "accuracy": 0.9905,
+  "scam_precision": 0.9573,
+  "scam_recall": 0.9739,
+  "scam_f1": 0.9655,
+  "roc_auc": 0.9987,
+  "pr_auc": 0.9934,
+  "operating_threshold": 0.42,
+  "confusion_matrix": {
+    "true_negative": 722,
+    "false_positive": 5,
+    "false_negative": 3,
+    "true_positive": 112
+  },
+  "test_samples_total": 842,
+  "test_scam_samples": 115,
+  "test_not_scam_samples": 727
+}

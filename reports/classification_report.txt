@@ -1,0 +1,16 @@
+=== PhishLens Test Evaluation Report ===
+
+Operating Threshold: 0.4200
+
+              precision    recall  f1-score   support
+
+    NOT_SCAM     0.9959    0.9931    0.9945       727
+        SCAM     0.9573    0.9739    0.9655       115
+
+    accuracy                         0.9905       842
+   macro avg     0.9766    0.9835    0.9800       842
+weighted avg     0.9906    0.9905    0.9905       842
+
+Confusion Matrix:
+TN: 722 | FP: 5
+FN: 3 | TP: 112
