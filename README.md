@@ -1,34 +1,33 @@
 <div align="center">
 
-# ⚡ PhishLens
+# PhishLens
 
-### High-Precision AI Scam & Phishing Detection System with OCR & Real-Time ML Inference
+### SMS and Screenshot Scam Detection Pipeline with OCR and Machine Learning
 
 <br/>
 
 <div align="center">
-    <a href="#-quick-start">Quick Start</a> •
-    <a href="#-key-features">Features</a> •
-    <a href="#-live-benchmarks--evaluation">Benchmarks</a> •
-    <a href="#-rest-api-reference">API Reference</a> •
-    <a href="#-neo-brutalist-web-ui">Web UI</a> •
-    <a href="#-docker-deployment">Docker</a>
+    <a href="#quick-start">Quick Start</a> •
+    <a href="#key-features">Features</a> •
+    <a href="#benchmarks-and-evaluation">Benchmarks</a> •
+    <a href="#api-reference">API Reference</a> •
+    <a href="#web-interface">Web Interface</a> •
+    <a href="#docker-deployment">Docker</a>
 </div>
 
 <br/>
 
-**The precision-first defense against SMS fraud and screenshot smishing.**<br>
-PhishLens is a production-grade machine learning and OCR platform engineered to detect phishing attacks in SMS texts and mobile screenshots with calibrated risk scoring, explainable signals, and zero data retention.
+A precision-oriented machine learning system designed to detect phishing and scam attempts across SMS text messages and smartphone screenshots. PhishLens combines optical character recognition (OCR), text entity normalization, and a calibrated TF-IDF classifier to output confidence-scored scam probabilities with explainable risk indicators.
 
 <br/>
 
-[![Python Version](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.4+-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
-[![RapidOCR](https://img.shields.io/badge/OCR-RapidOCR_ONNX-00D2FF?style=for-the-badge&logo=optical-character-recognition&logoColor=white)](https://github.com/RapidAI/RapidOCR)
-[![Accuracy](https://img.shields.io/badge/Accuracy-99.05%25-brightgreen?style=for-the-badge)](reports/metrics.json)
-[![SCAM Precision](https://img.shields.io/badge/SCAM_Precision-95.73%25-FFE600?style=for-the-badge&labelColor=000)](reports/metrics.json)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![Python Version](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.4+-F7931E?style=flat-square&logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![RapidOCR](https://img.shields.io/badge/OCR-RapidOCR_ONNX-00D2FF?style=flat-square)](https://github.com/RapidAI/RapidOCR)
+[![Accuracy](https://img.shields.io/badge/Accuracy-99.05%25-brightgreen?style=flat-square)](reports/metrics.json)
+[![SCAM Precision](https://img.shields.io/badge/SCAM_Precision-95.73%25-informational?style=flat-square)](reports/metrics.json)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 
 </div>
 
@@ -36,83 +35,83 @@ PhishLens is a production-grade machine learning and OCR platform engineered to 
 
 ---
 
-## 🧭 Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
     subgraph Inputs [Input Modalities]
-        A["💬 SMS / Raw Text"]
-        B["📸 Screenshot Image"]
+        A["SMS / Text String"]
+        B["Screenshot Image"]
     end
 
     subgraph OCR_Engine [OCR Processing]
-        B --> B1["OpenCV CLAHE Enhancement"]
+        B --> B1["OpenCV Preprocessing\n(Grayscale, CLAHE Contrast)"]
         B1 --> B2["RapidOCR ONNX Engine"]
-        B2 --> B3["Extracted Text & Confidence"]
+        B2 --> B3["Extracted Text + Confidence"]
     end
 
     subgraph ML_Pipeline [ML Inference Pipeline]
-        A --> C["Entity Normalizer\n(&lt;URL&gt;, &lt;PHONE&gt;, &lt;AMOUNT&gt;)"]
+        A --> C["Text Normalization\n(&lt;URL&gt;, &lt;PHONE&gt;, &lt;AMOUNT&gt;, &lt;EMAIL&gt;)"]
         B3 --> C
-        C --> D["Word + Char TF-IDF"]
+        C --> D["Word & Char n-gram TF-IDF"]
         D --> E["Calibrated Logistic Regression"]
         E --> F["Scam Probability P(scam)"]
-        F --> G{"Threshold\nP >= 0.42"}
+        F --> G{"Decision Threshold\nP >= 0.42"}
     end
 
     subgraph Outputs [Verdicts & Signals]
-        G -->|Yes| H["🚨 SCAM (High Risk)"]
-        G -->|No| I["✅ NOT_SCAM (Low Risk)"]
+        G -->|Yes| H["SCAM (High Risk)"]
+        G -->|No| I["NOT_SCAM (Low Risk)"]
         H --> J["Explainable Risk Signals"]
         I --> J
-        J --> K["FastAPI / Neo-Brutalist UI"]
+        J --> K["FastAPI / Web Dashboard"]
     end
 ```
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 <table>
 <tr>
 <td width="50%" valign="top">
 
-### 💬 Dual Input Modalities
-Accepts raw text messages as well as smartphone screenshots (PNG, JPG, WEBP), parsing message text automatically using embedded OCR.
+### Dual Modality Ingestion
+Accepts raw text payloads directly or extracts text from user-uploaded screenshots (PNG, JPG, WEBP) using an integrated OCR pipeline.
 
 </td>
 <td width="50%" valign="top">
 
-### 🎯 Precision-Targeted Objective
-Unlike standard classifiers optimized purely for accuracy, PhishLens tunes decision cutoffs strictly on validation data to achieve **SCAM Precision ≥ 90%** (operating point: `0.4200`).
-
-</td>
-</tr>
-<tr>
-<td width="50%" valign="top">
-
-### 🔍 Explainable Risk Signals
-Extracts salient positive TF-IDF model terms, suspicious domains/URLs, phone numbers, and urgent trigger patterns (e.g. KYC, blocked account, OTP prompts).
-
-</td>
-<td width="50%" valign="top">
-
-### ⚡ Rapid Local OCR
-Powered by `rapidocr_onnxruntime` and OpenCV adaptive contrast equalization. Runs on CPU via ONNX without external binary dependencies.
+### Precision-Oriented Threshold Tuning
+Optimizes decision cutoffs specifically on validation data to maintain high SCAM precision (>= 90%) while retaining high recall, preventing false positives on transactional SMS messages.
 
 </td>
 </tr>
 <tr>
 <td width="50%" valign="top">
 
-### 🎨 Neo-Brutalist Web UI
-Features a high-contrast Neo-Brutalist design system with drag-and-drop screenshot uploads, 1-click test presets, live risk gauge, and raw JSON inspectors.
+### Explainable Risk Signals
+Extracts salient positive TF-IDF feature weights, suspicious domain structures, payment indicators, and domain-specific urgency patterns.
 
 </td>
 <td width="50%" valign="top">
 
-### 🛡️ Enterprise Security & Privacy
-Zero message logging and immediate in-memory screenshot disposal. Fully typed with Pydantic schemas, CORS configuration, and payload validation.
+### Embedded ONNX OCR Engine
+Utilizes `rapidocr_onnxruntime` with OpenCV contrast enhancement. Executes locally on CPU without external binary dependencies or system daemon requirements.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### Neo-Brutalist Dashboard
+Includes an interactive web interface with drag-and-drop screenshot uploads, test presets, real-time probability meters, and raw JSON inspection.
+
+</td>
+<td width="50%" valign="top">
+
+### Stateless Execution & Privacy
+Operates statelessly without storing uploaded screenshots or persisting sensitive SMS payloads. Complete request validation via Pydantic schemas.
 
 </td>
 </tr>
@@ -120,9 +119,23 @@ Zero message logging and immediate in-memory screenshot disposal. Fully typed wi
 
 ---
 
-## ⚡ Quick Start
+## Quick Start
 
-### 1. Clone & Install
+### Option A: Windows 1-Click Launch (Recommended)
+
+Double-click `run.bat` in the project root, or execute from PowerShell / Command Prompt:
+
+```cmd
+run.bat
+```
+
+This script automatically verifies dependencies, runs training if model artifacts are missing, starts the FastAPI server on port 8080, and opens your default browser.
+
+---
+
+### Option B: Manual Setup
+
+#### 1. Clone & Install Dependencies
 
 ```bash
 git clone https://github.com/pprbkt/PhishLens.git
@@ -131,41 +144,41 @@ cd PhishLens
 pip install -r requirements.txt
 ```
 
-### 2. Download Data & Train Pipeline
+#### 2. Download Dataset & Train Model
 
 ```bash
-# 1. Fetch benchmark dataset + synthesize modern smishing examples (5,609 records)
+# Download benchmark dataset and modern smishing samples (5,609 records)
 python scripts/download_data.py
 
-# 2. Run leakage-free training, validation benchmarking, and threshold tuning
+# Run training, threshold optimization, and report generation
 python training/train.py
 ```
 
-### 3. Launch Web Server & UI
+#### 3. Start the Server
 
 ```bash
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
-- 🌐 **Neo-Brutalist Web Interface**: [http://localhost:8000](http://localhost:8000)
-- 📖 **Interactive Swagger UI**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- Web Interface: [http://localhost:8080](http://localhost:8080)
+- Swagger API Docs: [http://localhost:8080/docs](http://localhost:8080/docs)
 
 ---
 
-## 📊 Live Benchmarks & Evaluation
+## Benchmarks and Evaluation
 
-All metrics are evaluated strictly on the **held-out 15% unseen test split (842 samples)**:
+Model evaluation was conducted on a held-out, stratified test set representing 15% of the total dataset (842 samples). Threshold tuning was performed strictly on the validation set to prevent data leakage.
 
 <div align="center">
 
-| Metric | Score | Target | Status |
+| Metric | Score | Validation Target | Status |
 | :--- | :---: | :---: | :---: |
-| **Overall Accuracy** | **99.05%** | `> 95.0%` | ✅ **Exceeded** |
-| **SCAM Precision** | **95.73%** | `≥ 90.0%` | ✅ **Exceeded** |
-| **SCAM Recall** | **97.39%** | `> 90.0%` | ✅ **Exceeded** |
-| **SCAM F1-Score** | **0.9655** | `> 0.90` | ✅ **Exceeded** |
-| **ROC-AUC** | **0.9987** | `> 0.98` | ✅ **Exceeded** |
-| **PR-AUC** | **0.9934** | `> 0.95` | ✅ **Exceeded** |
+| **Accuracy** | **99.05%** | > 95.0% | Met |
+| **SCAM Precision** | **95.73%** | >= 90.0% | Met |
+| **SCAM Recall** | **97.39%** | > 90.0% | Met |
+| **SCAM F1-Score** | **0.9655** | > 0.90 | Met |
+| **ROC-AUC** | **0.9987** | > 0.98 | Met |
+| **PR-AUC** | **0.9934** | > 0.95 | Met |
 
 </div>
 
@@ -177,27 +190,28 @@ All metrics are evaluated strictly on the **held-out 15% unseen test split (842 
 | TF-IDF + Linear SVM | 98.81% | 95.65% | 95.65% | 0.9565 |
 | TF-IDF + Multinomial Naive Bayes | 98.45% | 94.74% | 93.91% | 0.9432 |
 
-### Test Confusion Matrix Breakdown (842 Samples)
+### Test Split Confusion Matrix (842 Samples)
+
 - **True Negatives (`NOT_SCAM`)**: 722
-- **False Positives**: 5 *(0.59% false alarm rate)*
+- **False Positives**: 5 (0.59% false positive rate)
 - **False Negatives**: 3
 - **True Positives (`SCAM`)**: 112
 
-Visual artifact charts are automatically produced in [`reports/confusion_matrix.png`](file:///c:/Users/Hades/Documents/PhishLens/reports/confusion_matrix.png) and [`reports/precision_recall_curve.png`](file:///c:/Users/Hades/Documents/PhishLens/reports/precision_recall_curve.png).
+Visual reports and charts are saved to `reports/confusion_matrix.png` and `reports/precision_recall_curve.png`.
 
 ---
 
-## 🔌 REST API Reference
+## API Reference
 
 <details open>
-<summary><strong>1. Single Text Phishing Detection — <code>POST /predict/text</code></strong></summary>
+<summary><strong>1. Text Prediction — <code>POST /predict/text</code></strong></summary>
 
 #### Request
 ```bash
-curl -X POST "http://localhost:8000/predict/text" \
+curl -X POST "http://localhost:8080/predict/text" \
   -H "Content-Type: application/json" \
   -d '{
-    "text": "URGENT: Your SBI account has been blocked due to KYC. Update PAN card immediately at http://sbi-kyc-update.top"
+    "text": "URGENT: Your SBI account has been blocked due to KYC. Update PAN card at http://sbi-kyc-update.top"
   }'
 ```
 
@@ -208,11 +222,10 @@ curl -X POST "http://localhost:8000/predict/text" \
   "scam_probability": 0.9505,
   "threshold": 0.42,
   "risk_level": "HIGH_RISK",
-  "cleaned_text": "urgent : your sbi account has been blocked due to kyc . update pan card immediately at <url>",
+  "cleaned_text": "urgent : your sbi account has been blocked due to kyc . update pan card at <url>",
   "signals": [
     "Suspicious link/URL: http://sbi-kyc-update.top",
     "High-risk indicator: 'urgent'",
-    "High-risk indicator: 'immediately'",
     "High-risk indicator: 'kyc'",
     "Model term weight: 'at url'"
   ],
@@ -222,11 +235,11 @@ curl -X POST "http://localhost:8000/predict/text" \
 </details>
 
 <details>
-<summary><strong>2. Screenshot OCR Scam Detection — <code>POST /predict/image</code></strong></summary>
+<summary><strong>2. Screenshot OCR Prediction — <code>POST /predict/image</code></strong></summary>
 
 #### Request
 ```bash
-curl -X POST "http://localhost:8000/predict/image" \
+curl -X POST "http://localhost:8080/predict/image" \
   -F "file=@screenshot.png"
 ```
 
@@ -249,16 +262,16 @@ curl -X POST "http://localhost:8000/predict/image" \
 </details>
 
 <details>
-<summary><strong>3. Batch Text Detection — <code>POST /predict/batch</code></strong></summary>
+<summary><strong>3. Batch Text Prediction — <code>POST /predict/batch</code></strong></summary>
 
 #### Request
 ```bash
-curl -X POST "http://localhost:8000/predict/batch" \
+curl -X POST "http://localhost:8080/predict/batch" \
   -H "Content-Type: application/json" \
   -d '{
     "texts": [
-      "Win ₹1,00,000 cash prize now! Call 9876543210",
-      "Hey, are we still meeting for coffee at Starbucks at 5 PM?"
+      "Win 100000 cash prize now! Call 9876543210",
+      "Hey, are we still meeting for lunch at 1 PM?"
     ]
   }'
 ```
@@ -271,19 +284,18 @@ curl -X POST "http://localhost:8000/predict/batch" \
   "not_scam_count": 1,
   "results": [
     {
-      "text": "Win ₹1,00,000 cash prize now! Call 9876543210",
+      "text": "Win 100000 cash prize now! Call 9876543210",
       "prediction": "SCAM",
       "scam_probability": 0.9999,
       "risk_level": "HIGH_RISK",
       "threshold": 0.42,
       "signals": [
-        "Financial amount requested/mentioned: ₹1,00,000",
         "Phone contact prompt: 9876543210"
       ],
       "model_version": "phishlens-v1"
     },
     {
-      "text": "Hey, are we still meeting for coffee at Starbucks at 5 PM?",
+      "text": "Hey, are we still meeting for lunch at 1 PM?",
       "prediction": "NOT_SCAM",
       "scam_probability": 0.0220,
       "risk_level": "LOW_RISK",
@@ -297,7 +309,7 @@ curl -X POST "http://localhost:8000/predict/batch" \
 </details>
 
 <details>
-<summary><strong>4. Health & Metrics Inspection — <code>GET /health</code> & <code>GET /metrics</code></strong></summary>
+<summary><strong>4. Health and Status — <code>GET /health</code> and <code>GET /metrics</code></strong></summary>
 
 #### `GET /health`
 ```json
@@ -312,18 +324,18 @@ curl -X POST "http://localhost:8000/predict/batch" \
 
 ---
 
-## 🎨 Neo-Brutalist Web UI
+## Web Interface
 
-PhishLens includes a responsive, high-energy **Neo-Brutalist** dashboard served directly at `/`:
+PhishLens provides a Neo-Brutalist dashboard accessible directly from the browser:
 
-- **Design Tokens**: Solid black borders (`3px solid #000`), hard shadows (`5px 5px 0 #000`), lemon yellow (`#FFE600`), neon orange (`#FF5C00`), and electric cyan accents.
-- **Interactive Preset Chips**: Instant 1-click loading for Bank KYC Scams, FedEx Smishing, Crypto Giveaways, Legitimate Bank OTPs, and Uber alerts.
-- **Dynamic Risk Gauge**: Visual probability bar with real-time operating threshold indicator and uncertainty banding (`HIGH_RISK`, `UNCERTAIN`, `LOW_RISK`).
-- **Screenshot Drag & Drop**: Native drag-and-drop file upload with live preview and OCR text drawer.
+- **Input Tabs**: Switch between direct SMS text inspection and screenshot OCR file uploads.
+- **Preset Buttons**: Test standard fraud vectors (KYC suspension, parcel delivery smishing, crypto lures) and legitimate transactional alerts.
+- **Interactive Threshold Slider**: Adjust decision thresholds dynamically between 0.10 and 0.95 to evaluate boundary behavior.
+- **Risk Indicator Drawer**: Displays risk level bands (`HIGH_RISK`, `UNCERTAIN`, `LOW_RISK`) and active feature signals.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 PhishLens/
@@ -332,75 +344,76 @@ PhishLens/
 │   │   ├── routes.py               # REST API endpoints
 │   │   └── schemas.py              # Pydantic request & response models
 │   ├── ml/
-│   │   ├── preprocess.py           # Text cleaner & entity normalizer
+│   │   ├── preprocess.py           # Text cleaning & entity normalization
 │   │   ├── classifier.py           # ModelManager runtime loader
-│   │   ├── threshold.py            # Precision threshold & risk banding
-│   │   ├── explain.py              # Term contribution & risk signal extractor
-│   │   └── inference.py            # Inference engine
+│   │   ├── threshold.py            # Decision thresholding & risk band logic
+│   │   ├── explain.py              # Term contribution & signal extractor
+│   │   └── inference.py            # Text and batch inference coordinator
 │   ├── ocr/
-│   │   ├── preprocess_image.py     # OpenCV CLAHE enhancement & deskewing
+│   │   ├── preprocess_image.py     # OpenCV contrast enhancement & deskewing
 │   │   └── extractor.py            # RapidOCR ONNX inference wrapper
 │   ├── static/
 │   │   ├── index.html              # Neo-Brutalist web interface
-│   │   ├── style.css               # Neo-Brutalist styling & animations
-│   │   └── app.js                  # UI controller & async fetch logic
+│   │   ├── style.css               # Design system & stylesheet
+│   │   └── app.js                  # Frontend client application
 │   ├── config.py                   # Pydantic Settings configuration
 │   └── main.py                     # FastAPI entry point & CORS
 ├── data/
-│   ├── raw/                        # Raw SMS and modern smishing dataset
+│   ├── raw/                        # Raw SMS dataset files
 │   ├── processed/                  # Stratified train / val / test splits
-│   └── README.md                   # Dataset provenance & schema
+│   └── README.md                   # Dataset documentation
 ├── training/
 │   ├── train.py                    # End-to-end training orchestrator
-│   ├── compare_models.py           # Model benchmarking module
-│   ├── tune_threshold.py           # Precision-oriented threshold tuner
+│   ├── compare_models.py           # Candidate model benchmarking
+│   ├── tune_threshold.py           # Validation threshold optimizer
 │   └── evaluate.py                 # Evaluation & visual report generator
 ├── models/
-│   ├── classifier.joblib           # Serialized Logistic Regression model
-│   ├── vectorizer.joblib           # Serialized Word + Char TF-IDF vectorizer
-│   └── metadata.json               # Model metrics and configuration
+│   ├── classifier.joblib           # Trained Logistic Regression model
+│   ├── vectorizer.joblib           # Fitted Word + Char TF-IDF vectorizer
+│   └── metadata.json               # Trained metrics and configuration
 ├── reports/
 │   ├── metrics.json                # Test evaluation metrics
-│   ├── classification_report.txt   # Scikit-learn classification report
-│   ├── confusion_matrix.png        # Confusion matrix visual chart
-│   ├── precision_recall_curve.png  # PR curve visual chart
+│   ├── classification_report.txt   # Classification report
+│   ├── confusion_matrix.png        # Confusion matrix chart
+│   ├── precision_recall_curve.png  # Precision-Recall curve chart
 │   └── threshold_analysis.csv      # Validation threshold sweep data
 ├── scripts/
-│   └── download_data.py            # Dataset downloader & synthesizer
+│   └── download_data.py            # Dataset fetcher & synthesizer
 ├── tests/
 │   ├── test_preprocessing.py       # Preprocessing unit tests
-│   ├── test_classifier.py          # Classifier & threshold unit tests
-│   ├── test_ocr.py                 # OCR & OpenCV image tests
-│   └── test_api.py                 # FastAPI integration tests
+│   ├── test_classifier.py          # Classifier unit tests
+│   ├── test_ocr.py                 # OCR unit tests
+│   └── test_api.py                 # API integration tests
 ├── notebooks/
-│   └── exploration.ipynb           # Exploratory data analysis notebook
+│   └── exploration.ipynb           # EDA exploration notebook
 ├── requirements.txt
 ├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
+├── run.bat                         # Windows 1-click startup script
 └── README.md
 ```
 
 ---
 
-## 🐳 Docker Deployment
+## Docker Deployment
 
-Run the complete PhishLens application container with Docker Compose:
+Run the containerized application with Docker Compose:
 
 ```bash
 docker compose up --build -d
 ```
 
-Check container status:
+Check status:
 ```bash
 docker compose ps
 ```
 
 ---
 
-## 🧪 Running Tests
+## Running Tests
 
-Execute the full automated test suite with pytest:
+Execute the complete automated test suite:
 
 ```bash
 pytest -v
@@ -421,14 +434,14 @@ tests/test_preprocessing.py::test_url_detection_and_replacement PASSED   [ 88%]
 
 ---
 
-## ⚠️ Limitations & Responsible Use
+## Limitations and Responsible Use
 
-- **Probabilistic Risk Tool**: PhishLens provides calibrated risk assessments to assist users and analysts; it is not a complete replacement for endpoint antivirus or hardware security keys.
-- **Image Quality**: Heavily distorted, low-contrast, or handwritten screenshot text can reduce OCR accuracy.
-- **Zero-Day Smishing**: Emerging evasion patterns may require periodic retraining on updated threat corpora.
+- **Statistical Assessment**: Output probabilities represent statistical pattern similarity and should be utilized as an advisory indicator rather than an absolute guarantee of fraud.
+- **Image Artifacts**: Severe image degradation, motion blur, or unusual handwriting can impair OCR text extraction accuracy.
+- **Threat Drift**: Scam patterns evolve over time; periodic model retraining on new phishing corpora is recommended.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
